@@ -45,3 +45,22 @@ class tda:
     def __call__(self, pcd):
         return self.forward(pcd)
 
+
+
+def ransac_tda(pcd, dim=2, fts='entropy', k=10, m=500):
+    """
+    pcd: the point cloud list to be calculated tda features. For single point cloud, add "[]", for example, tda([pcd])
+    k: the number of iterations
+    m: the number of points to sample in each iteration
+    return: 2D numpy array, features extracted from inputing point cloud list
+    """
+    tda_ = tda(homo_dim=dim, fts=fts)
+    rslt = []
+    for _ in range(k):
+        idx = np.random.choice(len(pcd), m)
+        pcd_ = [pcd[j] for j in idx]
+        pcd_ = np.array(pcd_).reshape((m, 3))
+        rslt.append(tda_([pcd_]))
+    return np.median(rslt, axis=0)
+
+
